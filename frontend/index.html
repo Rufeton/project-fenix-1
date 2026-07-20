@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Fenix</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Project Fenix</h1>
+    <p>Gestor de tareas para practicar DevOps.</p>
+
+    <section class="panel">
+      <h2>Nueva tarea</h2>
+      <form id="task-form">
+        <input id="title" maxlength="200" placeholder="Título" required>
+        <textarea id="description" maxlength="1000" placeholder="Descripción"></textarea>
+        <button type="submit">Crear tarea</button>
+      </form>
+      <p id="form-error" class="error" hidden></p>
+    </section>
+
+    <section class="panel">
+      <div class="tasks-header">
+        <h2>Tareas</h2>
+        <button id="refresh-button" type="button">Actualizar</button>
+      </div>
+      <p id="status">Cargando…</p>
+      <ul id="task-list"></ul>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
