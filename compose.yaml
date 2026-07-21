@@ -1,0 +1,41 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://fenix:fenix@postgres:5432/fenix
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:18.4
+    container_name: postgres
+    environment:
+      POSTGRES_USER: fenix
+      POSTGRES_PASSWORD: fenix
+      POSTGRES_DB: fenix
+    volumes:
+      - type: volume
+        source: postgres_data
+        target: /var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fenix -d fenix"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
