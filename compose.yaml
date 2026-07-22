@@ -3,6 +3,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
@@ -29,6 +30,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER} 
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    restart: unless-stopped
     volumes:
       - type: volume
         source: postgres_data
@@ -45,6 +47,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    restart: unless-stopped
 
 volumes:
   postgres_data:
