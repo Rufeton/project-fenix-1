@@ -9,3 +9,4 @@ backend/.env
 Thumbs.db
 *.log
 chuleta.txt
+.env
