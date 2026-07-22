@@ -3,7 +3,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: backend
     ports:
       - "8000:8000"
     environment:
@@ -14,7 +13,6 @@ services:
 
   postgres:
     image: postgres:18.4
-    container_name: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER} 
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -33,7 +31,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: frontend
     ports:
       - "8080:8080"
 
