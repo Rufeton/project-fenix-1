@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000";
+const API_URL = "/api";
 
 const form = document.querySelector("#task-form");
 const titleInput = document.querySelector("#title");
