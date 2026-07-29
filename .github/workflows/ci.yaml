@@ -1,0 +1,69 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+        env:
+            POSTGRES_USER: fenix
+            POSTGRES_PASSWORD: ci_password
+            POSTGRES_DB: fenix
+        steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Set up Python
+          uses: actions/setup-python@v6
+          with:
+            python-version: "3.10"
+
+        - name: Validate Docker Compose
+          run: docker compose config --quiet
+
+        - name: Build and start services
+          run: docker compose up -d --build
+
+        - name: Wait for application
+          run: |
+            for i in {1..12}; do
+              curl --fail http://localhost:8080/api/health && exit 0
+              sleep 5
+            done
+
+            docker compose ps
+            docker compose logs
+            exit 1
+
+        - name: Test tasks endpoint
+          run: |
+            python - <<'PY'
+            import json
+            import urllib.request
+
+            with urllib.request.urlopen(
+                "http://localhost:8080/api/tasks",
+                timeout=5
+            ) as response:
+                if response.status != 200:
+                    raise SystemExit(
+                        f"Unexpected status: {response.status}"
+                    )
+
+                data = json.load(response)
+
+                if not isinstance(data, list):
+                    raise SystemExit("Expected a JSON list")
+
+                print("Tasks endpoint OK")
+            PY
+
+        - name: Stop services
+          if: always()
+          run: docker compose down
