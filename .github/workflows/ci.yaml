@@ -9,61 +9,112 @@ on:
       - main
 
 jobs:
-    build-and-test:
-        runs-on: ubuntu-latest
-        env:
-            POSTGRES_USER: fenix
-            POSTGRES_PASSWORD: ci_password
-            POSTGRES_DB: fenix
-        steps:
-        - name: Checkout repository
-          uses: actions/checkout@v4
+  build-and-test:
+    runs-on: ubuntu-latest
 
-        - name: Set up Python
-          uses: actions/setup-python@v6
-          with:
-            python-version: "3.10"
+    permissions:
+      contents: read
 
-        - name: Validate Docker Compose
-          run: docker compose config --quiet
+    env:
+      POSTGRES_USER: fenix
+      POSTGRES_PASSWORD: ci_password
+      POSTGRES_DB: fenix
 
-        - name: Build and start services
-          run: docker compose up -d --build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-        - name: Wait for application
-          run: |
-            for i in {1..12}; do
-              curl --fail http://localhost:8080/api/health && exit 0
-              sleep 5
-            done
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
 
-            docker compose ps
-            docker compose logs
-            exit 1
+      - name: Validar Docker Compose
+        run: docker compose config --quiet
 
-        - name: Test tasks endpoint
-          run: |
-            python - <<'PY'
-            import json
-            import urllib.request
+      - name: Construir y levantar servicios
+        run: docker compose up -d --build
 
-            with urllib.request.urlopen(
-                "http://localhost:8080/api/tasks",
-                timeout=5
-            ) as response:
-                if response.status != 200:
-                    raise SystemExit(
-                        f"Unexpected status: {response.status}"
-                    )
+      - name: Wait for application
+        run: |
+          for i in {1..12}; do
+            curl --fail http://localhost:8080/api/health && exit 0
+            sleep 5
+          done
 
-                data = json.load(response)
+          docker compose ps
+          docker compose logs
+          exit 1
 
-                if not isinstance(data, list):
-                    raise SystemExit("Expected a JSON list")
+      - name: Testear endpoint
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.request
 
-                print("Tasks endpoint OK")
-            PY
+          with urllib.request.urlopen(
+              "http://localhost:8080/api/tasks",
+              timeout=5
+          ) as response:
+              if response.status != 200:
+                  raise SystemExit(
+                      f"Unexpected status: {response.status}"
+                  )
 
-        - name: Stop services
-          if: always()
-          run: docker compose down
+              data = json.load(response)
+
+              if not isinstance(data, list):
+                  raise SystemExit("Expected a JSON list")
+
+              print("Tasks endpoint OK")
+          PY
+
+      - name: Parar Servicios
+        if: always()
+        run: docker compose down
+
+  publish-images:
+    needs: build-and-test
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Loguearse en GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Construir imagen backend
+        run: |
+          docker build \
+            -t ghcr.io/rufeton/project-fenix-backend:${{ github.sha }} \
+            -t ghcr.io/rufeton/project-fenix-backend:latest \
+            ./backend
+
+      - name: Push imagen backend
+        run: |
+          docker push ghcr.io/rufeton/project-fenix-backend:${{ github.sha }}
+          docker push ghcr.io/rufeton/project-fenix-backend:latest
+
+      - name: Construir imagen frontend
+        run: |
+          docker build \
+            -t ghcr.io/rufeton/project-fenix-frontend:${{ github.sha }} \
+            -t ghcr.io/rufeton/project-fenix-frontend:latest \
+            ./frontend
+
+      - name: Push imagen frontend
+        run: |
+          docker push ghcr.io/rufeton/project-fenix-frontend:${{ github.sha }}
+          docker push ghcr.io/rufeton/project-fenix-frontend:latest
