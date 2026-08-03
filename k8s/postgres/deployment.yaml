@@ -33,7 +33,7 @@ spec:
           livenessProbe:
             exec:
               command:
-                - pg_isrea
+                - pg_isready
                 - -U
                 - fenix
                 - -d
