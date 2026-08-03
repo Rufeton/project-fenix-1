@@ -22,25 +22,35 @@ spec:
         - name: backend-container
           image: ghcr.io/rufeton/project-fenix-backend:0a6817e9fba727b53e5655fde8e125e99e03f9e0
           imagePullPolicy: IfNotPresent
-
           ports:
             - name: http
               containerPort: 8000
               protocol: TCP
-
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
           env:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
                   name: postgres-secrets
                   key: postgres-user
-
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: postgres-secrets
                   key: postgres-password
-
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
