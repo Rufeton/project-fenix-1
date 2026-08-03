@@ -6,6 +6,8 @@ metadata:
     app: fenix-postgres
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: fenix-postgres
@@ -31,7 +33,7 @@ spec:
           livenessProbe:
             exec:
               command:
-                - pg_isready
+                - pg_isrea
                 - -U
                 - fenix
                 - -d
