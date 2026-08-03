@@ -65,6 +65,13 @@ spec:
                 secretKeyRef:
                   name: postgres-secrets
                   key: postgres-db
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
