@@ -4,19 +4,15 @@ metadata:
   name: backend-deployment
   labels:
     app: fenix-backend
-
 spec:
   replicas: 1
-
   selector:
     matchLabels:
       app: fenix-backend
-
   template:
     metadata:
       labels:
         app: fenix-backend
-
     spec:
       containers:
         - name: backend-container
@@ -40,6 +36,13 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 3
             failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
           env:
             - name: POSTGRES_USER
               valueFrom:
