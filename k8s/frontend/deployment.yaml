@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: fenix-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fenix-frontend
+  template:
+    metadata:
+      labels:
+        app: fenix-frontend
+    spec:
+      containers:
+        - name: frontend-container
+          image: ghcr.io/rufeton/project-fenix-frontend:0a6817e9fba727b53e5655fde8e125e99e03f9e0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP

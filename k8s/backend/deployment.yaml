@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: fenix-backend
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: fenix-backend
+
+  template:
+    metadata:
+      labels:
+        app: fenix-backend
+
+    spec:
+      containers:
+        - name: backend-container
+          image: ghcr.io/rufeton/project-fenix-backend:0a6817e9fba727b53e5655fde8e125e99e03f9e0
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: postgres-user
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: postgres-password
+
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: postgres-db
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: database-url
