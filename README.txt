@@ -1,7 +1,6 @@
 # Project Fenix
 
-Este proyecto es la parte 1 de 4 donde voy a utilizar diferentes tecnologias como docker, kubernetes,terraform, Github actions,aws, para
-poner en mi CV y demostrar que tengo experiencia y conocimientos como Devops.
+Proyecto con tecnologias devops como docker, kubernetes,terraform, Github actions,aws.
 
 ## Arquitectura
 
