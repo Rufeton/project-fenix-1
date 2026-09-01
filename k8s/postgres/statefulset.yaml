@@ -1,13 +1,12 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: postgres-deployment
+  name: postgres
   labels:
     app: fenix-postgres
 spec:
+  serviceName: postgres-headless
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: fenix-postgres
@@ -72,7 +71,12 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
-      volumes:
-        - name: postgres-data
-          persistentVolumeClaim:
-            claimName: postgres-pvc
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
