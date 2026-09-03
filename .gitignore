@@ -11,3 +11,8 @@ Thumbs.db
 chuleta.txt
 .env
 k8s/secrets/postgres-secrets.yaml
+.terraform/
+*.tfstate
+*.tfstate.*
+INFORME-ANALISIS-SOLO-LECTURA.md
+documentacion/

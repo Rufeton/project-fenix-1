@@ -1,0 +1,13 @@
+services:
+  floci:
+    image: floci/floci:1.5.26
+    ports:
+      - "4566:4566"
+    environment:
+      FLOCI_STORAGE_MODE: persistent
+      FLOCI_STORAGE_PERSISTENT_PATH: /app/data
+    volumes:
+      - floci_data:/app/data
+
+volumes:
+  floci_data:
